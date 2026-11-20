@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Welcome Home</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #07060f; }
+  body {
+    font-family: "Georgia", "Times New Roman", serif;
+    color: #f6efe4;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Night-sky background with a warm glow rising behind the house */
+  .sky {
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 45% at 50% 62%, rgba(255,176,94,0.0) 0%, rgba(7,6,15,0) 70%),
+      radial-gradient(ellipse at 50% 120%, #2a1840 0%, #120d24 45%, #07060f 80%);
+  }
+  .glow {
+    position: fixed; left: 50%; top: 58%;
+    width: 70vw; height: 70vw; transform: translate(-50%, -50%) scale(0.4);
+    background: radial-gradient(circle, rgba(255,184,108,0.35) 0%, rgba(255,140,80,0.12) 35%, rgba(0,0,0,0) 65%);
+    opacity: 0;
+    animation: glowUp 3s ease-out 2.2s forwards;
+  }
+
+  /* Twinkling stars */
+  .star {
+    position: fixed; width: 2px; height: 2px; border-radius: 50%;
+    background: #fff; opacity: 0;
+    animation: twinkle 3s ease-in-out infinite;
+  }
+
+  .stage {
+    position: relative; z-index: 2;
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center;
+  }
+
+  /* House drawn line by line */
+  .house { width: 16vw; height: auto; margin-bottom: 3vh; overflow: visible; }
+  .house path, .house rect {
+    fill: none; stroke: #ffcf8a; stroke-width: 2.2;
+    stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 600; stroke-dashoffset: 600;
+    animation: draw 2.2s ease-in-out forwards;
+    filter: drop-shadow(0 0 6px rgba(255,190,110,0.6));
+  }
+  .house .walls { animation-delay: 0.6s; }
+  .house .door  { animation-delay: 1.5s; animation-duration: 1.2s; }
+  .house .win   { animation-delay: 1.8s; animation-duration: 1s; }
+  .house .window-light {
+    fill: #ffcf8a; stroke: none; opacity: 0;
+    animation: lightOn 0.8s ease-out 2.8s forwards;
+  }
+  .house .heart {
+    fill: #ff7a85; stroke: none; opacity: 0;
+    transform-origin: 100px 52px;
+    animation: heartPop 0.9s cubic-bezier(.2,1.6,.4,1) 3.2s forwards,
+               beat 1.6s ease-in-out 4.2s infinite;
+  }
+
+  .welcome {
+    font-size: 2.2vw; letter-spacing: 1.2vw; text-transform: uppercase;
+    color: #ffcf8a; opacity: 0;
+    animation: rise 1.4s ease-out 3.4s forwards;
+  }
+  .names {
+    font-size: 6.4vw; font-style: italic; line-height: 1.15;
+    margin-top: 1.5vh; opacity: 0;
+    background: linear-gradient(90deg, #ffe7c2, #ffb38a, #ffe7c2);
+    background-size: 200% 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: rise 1.6s ease-out 4.1s forwards, shimmer 5s linear 5.5s infinite;
+  }
+  .names .amp { font-style: normal; color: #ff7a85; -webkit-text-fill-color: #ff7a85; padding: 0 1.2vw; }
+  .house-word {
+    font-size: 2vw; letter-spacing: 0.6vw; margin-top: 1vh; opacity: 0;
+    color: #e9dccb;
+    animation: rise 1.4s ease-out 5s forwards;
+  }
+  .arabic {
+    font-family: "Geeza Pro", "Noto Naskh Arabic", "Arial", sans-serif;
+    direction: rtl; font-size: 3vw; margin-top: 3vh; opacity: 0;
+    color: #ffcf8a;
+    animation: rise 1.6s ease-out 5.9s forwards;
+  }
+  .line {
+    width: 0; height: 1px; margin-top: 2.5vh;
+    background: linear-gradient(90deg, transparent, #ffcf8a, transparent);
+    animation: lineGrow 1.6s ease-out 6.6s forwards;
+  }
+
+  @keyframes draw     { to { stroke-dashoffset: 0; } }
+  @keyframes lightOn  { to { opacity: 0.85; } }
+  @keyframes heartPop { from { opacity: 0; transform: scale(0); } to { opacity: 1; transform: scale(1); } }
+  @keyframes beat     { 0%,100% { transform: scale(1); } 15% { transform: scale(1.18); } 30% { transform: scale(1); } }
+  @keyframes rise     { from { opacity: 0; transform: translateY(2.5vh); filter: blur(6px); }
+                        to   { opacity: 1; transform: translateY(0);    filter: blur(0); } }
+  @keyframes shimmer  { to { background-position: -200% 0; } }
+  @keyframes lineGrow { to { width: 30vw; } }
+  @keyframes glowUp   { to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+  @keyframes twinkle  { 0%,100% { opacity: 0; } 50% { opacity: var(--o, 0.8); } }
+
+  /* Gentle fade-out at the end */
+  .fade { position: fixed; inset: 0; background: #07060f; opacity: 0; z-index: 5; pointer-events: none;
+          animation: fadeOut 1.5s ease-in 12s forwards; }
+  @keyframes fadeOut { to { opacity: 1; } }
+</style>
+</head>
+<body>
+  <div class="sky"></div>
+  <div class="glow"></div>
+  <div id="stars"></div>
+
+  <div class="stage">
+    <svg class="house" viewBox="0 0 200 170" xmlns="http://www.w3.org/2000/svg">
+      <path class="roof" d="M20 85 L100 15 L180 85" />
+      <path class="walls" d="M38 72 L38 160 L162 160 L162 72" />
+      <rect class="door" x="86" y="112" width="28" height="48" rx="3" />
+      <rect class="window-light" x="53" y="96" width="22" height="22" rx="2" />
+      <rect class="window-light" x="125" y="96" width="22" height="22" rx="2" />
+      <rect class="win" x="53" y="96" width="22" height="22" rx="2" />
+      <rect class="win" x="125" y="96" width="22" height="22" rx="2" />
+      <path class="heart" d="M100 64 C 88 54, 84 44, 92 40 C 96 38, 100 41, 100 45 C 100 41, 104 38, 108 40 C 116 44, 112 54, 100 64 Z" />
+    </svg>
+
+    <div class="welcome">Welcome Home</div>
+    <div class="names">Hussein<span class="amp">&amp;</span>Dhay</div>
+    <div class="house-word">— our home —</div>
+    <div class="arabic">أهلاً وسهلاً في بيت حسين وضي</div>
+    <div class="line"></div>
+  </div>
+
+  <div class="fade"></div>
+
+  <script>
+    var stars = document.getElementById('stars');
+    for (var i = 0; i < 90; i++) {
+      var s = document.createElement('div');
+      s.className = 'star';
+      var size = Math.random() < 0.15 ? 3 : 2;
+      s.style.width = s.style.height = size + 'px';
+      s.style.left = (Math.random() * 100) + 'vw';
+      s.style.top = (Math.random() * 70) + 'vh';
+      s.style.setProperty('--o', (0.4 + Math.random() * 0.6).toFixed(2));
+      s.style.animationDelay = (Math.random() * 4).toFixed(2) + 's';
+      s.style.animationDuration = (2 + Math.random() * 3).toFixed(2) + 's';
+      stars.appendChild(s);
+    }
+    // Try to go full screen on the TV browser
+    try { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); } catch (e) {}
+  </script>
+</body>
+</html>
