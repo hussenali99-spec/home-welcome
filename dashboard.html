@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Good Morning</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body {
+    font-family: "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+    color: #f6efe4;
+    background:
+      radial-gradient(ellipse 80% 60% at 85% 0%, rgba(255,170,90,0.22) 0%, rgba(0,0,0,0) 60%),
+      linear-gradient(160deg, #1b1430 0%, #120d24 55%, #0a0816 100%);
+    padding: 4.5vh 4.5vw;
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 3.5vh 3.5vw;
+    animation: fadeIn 1.2s ease-out;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .serif { font-family: Georgia, "Times New Roman", serif; }
+  .ar { font-family: "Geeza Pro", "Noto Naskh Arabic", Arial, sans-serif; direction: rtl; }
+  .muted { color: #b9aec8; }
+  .gold { color: #ffcf8a; }
+
+  /* Top row */
+  .greet { grid-column: 1 / 2; align-self: end; }
+  .greet .hello { font-size: 4.2vw; font-style: italic; line-height: 1.1; }
+  .greet .hello .names {
+    background: linear-gradient(90deg, #ffe7c2, #ffb38a);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .greet .hello-ar { font-size: 2.2vw; margin-top: 1vh; text-align: left; }
+
+  .clock { grid-column: 2 / 3; text-align: right; align-self: end; }
+  .clock .time { font-size: 7.5vw; font-weight: 200; letter-spacing: -0.2vw; line-height: 1; }
+  .clock .time .ampm { font-size: 2.2vw; font-weight: 400; margin-left: 0.6vw; color: #ffcf8a; }
+  .clock .date { font-size: 1.7vw; margin-top: 1vh; }
+  .clock .hijri { font-size: 1.6vw; margin-top: 0.6vh; }
+
+  /* Cards */
+  .card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,207,138,0.16);
+    border-radius: 1.6vw;
+    padding: 3vh 2.4vw;
+    backdrop-filter: blur(6px);
+  }
+  .card h2 {
+    font-size: 1.15vw; font-weight: 600; letter-spacing: 0.35vw;
+    text-transform: uppercase; color: #ffcf8a; margin-bottom: 2.2vh;
+  }
+
+  .now { grid-column: 1 / 2; display: flex; flex-direction: column; justify-content: space-between; }
+  .now-main { display: flex; align-items: center; gap: 2.5vw; }
+  .now-icon { font-size: 8vw; line-height: 1; }
+  .now-temp { font-size: 7vw; font-weight: 200; line-height: 1; }
+  .now-desc { font-size: 2vw; margin-top: 0.8vh; }
+  .now-desc-ar { font-size: 1.7vw; margin-top: 0.4vh; text-align: left; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2vw; margin-top: 3vh; }
+  .stat { background: rgba(255,255,255,0.04); border-radius: 1vw; padding: 1.6vh 1vw; }
+  .stat .k { font-size: 0.95vw; letter-spacing: 0.15vw; text-transform: uppercase; color: #b9aec8; }
+  .stat .v { font-size: 2vw; margin-top: 0.6vh; }
+
+  .hours { grid-column: 2 / 3; }
+  .hour-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1vw; text-align: center; }
+  .hour .t { font-size: 1.2vw; color: #b9aec8; }
+  .hour .i { font-size: 3vw; margin: 1.2vh 0; }
+  .hour .d { font-size: 1.9vw; }
+  .sun { display: flex; justify-content: space-between; margin-top: 4vh; padding-top: 3vh;
+         border-top: 1px solid rgba(255,207,138,0.14); font-size: 1.6vw; }
+  .sun span.k { font-size: 1vw; letter-spacing: 0.2vw; text-transform: uppercase; color: #b9aec8; display: block; margin-bottom: 0.6vh; }
+
+  .footer { grid-column: 1 / 3; display: flex; justify-content: space-between; align-items: center;
+            font-size: 1.15vw; }
+  .tip { font-size: 1.5vw; font-style: italic; }
+  .error { color: #ff9a8a; }
+</style>
+</head>
+<body>
+  <div class="greet">
+    <div class="hello serif"><span id="greeting">Good morning</span>,<br><span class="names">Hussein &amp; Dhay</span></div>
+    <div class="hello-ar ar gold" id="greeting-ar">صباح الخير يا حسين وضي</div>
+  </div>
+
+  <div class="clock">
+    <div class="time" id="time">--:--<span class="ampm" id="ampm"></span></div>
+    <div class="date" id="date"></div>
+    <div class="hijri ar gold" id="hijri"></div>
+  </div>
+
+  <div class="card now">
+    <div>
+      <h2>Baghdad · Now</h2>
+      <div class="now-main">
+        <div class="now-icon" id="now-icon">·</div>
+        <div>
+          <div class="now-temp" id="now-temp">--°</div>
+          <div class="now-desc" id="now-desc">Loading weather…</div>
+          <div class="now-desc-ar ar muted" id="now-desc-ar"></div>
+        </div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="k">High / Low</div><div class="v" id="hilo">--</div></div>
+      <div class="stat"><div class="k">Feels like</div><div class="v" id="feels">--</div></div>
+      <div class="stat"><div class="k">Humidity</div><div class="v" id="hum">--</div></div>
+      <div class="stat"><div class="k">Rain chance</div><div class="v" id="rain">--</div></div>
+    </div>
+  </div>
+
+  <div class="card hours">
+    <h2>Next hours</h2>
+    <div class="hour-row" id="hours"></div>
+    <div class="sun">
+      <div><span class="k">Sunrise</span><span id="sunrise">--</span></div>
+      <div style="text-align:center"><span class="k">Wind</span><span id="wind">--</span></div>
+      <div style="text-align:right"><span class="k">Sunset</span><span id="sunset">--</span></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="tip serif muted" id="tip"></div>
+    <div class="muted" id="updated"></div>
+  </div>
+
+<script>
+  var TZ = 'Asia/Baghdad';
+  var LAT = 33.3152, LON = 44.3661;
+
+  // WMO weather codes -> icon, English, Arabic
+  var WX = {
+    0: ['☀️', 'Clear sky', 'سماء صافية'],
+    1: ['🌤️', 'Mostly clear', 'صافٍ غالباً'],
+    2: ['⛅', 'Partly cloudy', 'غائم جزئياً'],
+    3: ['☁️', 'Cloudy', 'غائم'],
+    45: ['🌫️', 'Fog', 'ضباب'], 48: ['🌫️', 'Fog', 'ضباب'],
+    51: ['🌦️', 'Light drizzle', 'رذاذ خفيف'], 53: ['🌦️', 'Drizzle', 'رذاذ'], 55: ['🌦️', 'Heavy drizzle', 'رذاذ كثيف'],
+    61: ['🌧️', 'Light rain', 'مطر خفيف'], 63: ['🌧️', 'Rain', 'مطر'], 65: ['🌧️', 'Heavy rain', 'مطر غزير'],
+    71: ['🌨️', 'Light snow', 'ثلج خفيف'], 73: ['🌨️', 'Snow', 'ثلج'], 75: ['🌨️', 'Heavy snow', 'ثلج كثيف'],
+    80: ['🌦️', 'Showers', 'زخات مطر'], 81: ['🌧️', 'Showers', 'زخات مطر'], 82: ['⛈️', 'Heavy showers', 'زخات غزيرة'],
+    95: ['⛈️', 'Thunderstorm', 'عاصفة رعدية'], 96: ['⛈️', 'Thunderstorm', 'عاصفة رعدية'], 99: ['⛈️', 'Thunderstorm', 'عاصفة رعدية']
+  };
+  function wx(c) { return WX[c] || ['🌡️', 'Weather', 'الطقس']; }
+
+  var TIPS = [
+    'Have a beautiful day together.',
+    'A good day starts with a good breakfast.',
+    'Small moments, big memories.',
+    'Home is wherever we are together.',
+    'Make today count.',
+    'Drink some water before your coffee.',
+    'Kindness is always in season.'
+  ];
+
+  function parts(d) {
+    var f = new Intl.DateTimeFormat('en-GB', { timeZone: TZ, hour: 'numeric', minute: '2-digit', hour12: true });
+    return f.formatToParts(d).reduce(function (o, p) { o[p.type] = p.value; return o; }, {});
+  }
+  function hourIn(d) {
+    return parseInt(new Intl.DateTimeFormat('en-GB', { timeZone: TZ, hour: '2-digit', hour12: false }).format(d), 10);
+  }
+  function fmtTime(iso) { // "2026-11-21T06:21" local Baghdad
+    var hm = iso.split('T')[1].split(':');
+    var h = parseInt(hm[0], 10), ap = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    return h + ':' + hm[1] + ' ' + ap;
+  }
+
+  function tick() {
+    var now = new Date();
+    var p = parts(now);
+    document.getElementById('time').innerHTML = p.hour + ':' + p.minute +
+      '<span class="ampm">' + (p.dayPeriod || '').toUpperCase() + '</span>';
+    document.getElementById('date').textContent = new Intl.DateTimeFormat('en-GB',
+      { timeZone: TZ, weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(now);
+    try {
+      document.getElementById('hijri').textContent = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura-nu-arab',
+        { timeZone: TZ, weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(now);
+    } catch (e) {}
+    var h = hourIn(now), g, ga;
+    if (h >= 4 && h < 12) { g = 'Good morning'; ga = 'صباح الخير يا حسين وضي'; }
+    else if (h < 17) { g = 'Good afternoon'; ga = 'نهاركم سعيد يا حسين وضي'; }
+    else { g = 'Good evening'; ga = 'مساء الخير يا حسين وضي'; }
+    document.getElementById('greeting').textContent = g;
+    document.getElementById('greeting-ar').textContent = ga;
+  }
+
+  function loadWeather() {
+    var url = 'https://api.open-meteo.com/v1/forecast?latitude=' + LAT + '&longitude=' + LON +
+      '&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m' +
+      '&hourly=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max' +
+      '&timezone=' + encodeURIComponent(TZ) + '&forecast_days=2';
+    fetch(url).then(function (r) { return r.json(); }).then(function (d) {
+      var c = d.current, w = wx(c.weather_code);
+      document.getElementById('now-icon').textContent = w[0];
+      document.getElementById('now-temp').textContent = Math.round(c.temperature_2m) + '°';
+      document.getElementById('now-desc').textContent = w[1];
+      document.getElementById('now-desc-ar').textContent = w[2];
+      document.getElementById('hilo').textContent =
+        Math.round(d.daily.temperature_2m_max[0]) + '° / ' + Math.round(d.daily.temperature_2m_min[0]) + '°';
+      document.getElementById('feels').textContent = Math.round(c.apparent_temperature) + '°';
+      document.getElementById('hum').textContent = c.relative_humidity_2m + '%';
+      var rp = d.daily.precipitation_probability_max[0];
+      document.getElementById('rain').textContent = (rp == null ? '–' : rp + '%');
+      document.getElementById('wind').textContent = Math.round(c.wind_speed_10m) + ' km/h';
+      document.getElementById('sunrise').textContent = fmtTime(d.daily.sunrise[0]);
+      document.getElementById('sunset').textContent = fmtTime(d.daily.sunset[0]);
+
+      // next 6 hours, starting from the current hour
+      var cur = c.time.slice(0, 13); // "YYYY-MM-DDTHH"
+      var i = 0;
+      while (i < d.hourly.time.length && d.hourly.time[i].slice(0, 13) < cur) i++;
+      var html = '';
+      for (var k = 1; k <= 6 && i + k < d.hourly.time.length; k++) {
+        var t = d.hourly.time[i + k], hh = parseInt(t.slice(11, 13), 10);
+        var label = (hh % 12 || 12) + (hh >= 12 ? ' PM' : ' AM');
+        html += '<div class="hour"><div class="t">' + label + '</div><div class="i">' +
+          wx(d.hourly.weather_code[i + k])[0] + '</div><div class="d">' +
+          Math.round(d.hourly.temperature_2m[i + k]) + '°</div></div>';
+      }
+      document.getElementById('hours').innerHTML = html;
+      var p = parts(new Date());
+      document.getElementById('updated').textContent = 'Updated ' + p.hour + ':' + p.minute + ' ' + (p.dayPeriod || '');
+    }).catch(function () {
+      document.getElementById('now-desc').innerHTML = '<span class="error">Weather unavailable right now</span>';
+    });
+  }
+
+  var day = new Date().getDate();
+  document.getElementById('tip').textContent = '“' + TIPS[day % TIPS.length] + '”';
+  tick(); setInterval(tick, 1000);
+  loadWeather(); setInterval(loadWeather, 15 * 60 * 1000);
+</script>
+</body>
+</html>
