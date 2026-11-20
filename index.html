@@ -152,20 +152,12 @@
       s.style.animationDuration = (2 + Math.random() * 3).toFixed(2) + 's';
       stars.appendChild(s);
     }
-    // In the morning (4am-12pm Baghdad), continue to the morning dashboard
-    try {
-      var bh = parseInt(new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Baghdad', hour: '2-digit', hour12: false }).format(new Date()), 10);
-      var forced = location.search.indexOf('dashboard') !== -1;
-      var go = function () { setTimeout(function () { location.replace('dashboard.html'); }, 13200); };
-      if (forced || (bh >= 4 && bh < 12)) { go(); }
-      else {
-        // "Show the dashboard now" switch, set remotely in mode.json
-        fetch('mode.json?t=' + Date.now(), { cache: 'no-store' })
-          .then(function (r) { return r.json(); })
-          .then(function (m) { if (m && m.dashboard_until && Date.now() < m.dashboard_until) go(); })
-          .catch(function () {});
-      }
-    } catch (e) {}
+    // Routing logic lives in app.js, loaded fresh every time (TV browsers cache pages)
+    (function () {
+      var sc = document.createElement('script');
+      sc.src = 'app.js?t=' + Date.now();
+      document.body.appendChild(sc);
+    })();
     // Try to go full screen on the TV browser
     try { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); } catch (e) {}
   </script>
